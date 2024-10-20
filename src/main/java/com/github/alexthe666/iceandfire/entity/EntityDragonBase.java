@@ -2344,31 +2344,13 @@ public abstract class EntityDragonBase extends TamableAnimal implements IPassabi
             this.hoverTicks = 0;
             this.flyTicks = 0;
 
-            if (this.isGoingUp()) {
-                if (!this.isFlying() && !this.isHovering()) {
-                    // Update spacebar tick for take off
-                    this.spacebarTicks += 2;
-                }
-            } else if (this.isDismounting()) {
+            if (this.isDismounting()) {
                 if (this.isFlying() || this.isHovering()) {
                     // If the rider decided to dismount in air, try to follow
                     this.setCommand(2);
                 }
             }
-            // Update spacebar ticks and take off
-            if (this.spacebarTicks > 0) {
-                this.spacebarTicks--;
-            }
-            // Hold spacebar 1 sec to take off
-            if (this.spacebarTicks > 20 && this.getOwner() != null && this.getPassengers().contains(this.getOwner())
-                    && !this.isFlying() && !this.isHovering()) {
-                if (!this.isInWater()) {
-                    this.setHovering(true);
-                    this.spacebarTicks = 0;
 
-                    this.glidingSpeedBonus = 0;
-                }
-            }
             if (isFlying() || isHovering()) {
                 if (rider.zza > 0) {
                     this.setFlying(true);
@@ -2386,6 +2368,16 @@ public abstract class EntityDragonBase extends TamableAnimal implements IPassabi
                 if (!this.isOverAir() && this.isGoingDown() && !this.isInWater()) {
                     this.setFlying(false);
                     this.setHovering(false);
+                }
+            }
+
+            // take off
+            if (this.isGoingUp() && this.getOwner() != null && this.getPassengers().contains(this.getOwner())
+                    && !this.isFlying() && !this.isHovering()) {
+                if (!this.isInWater()) {
+                    this.setHovering(true);
+                    this.spacebarTicks = 0;
+                    this.glidingSpeedBonus = 0;
                 }
             }
 
