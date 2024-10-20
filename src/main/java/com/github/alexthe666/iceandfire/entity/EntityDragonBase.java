@@ -31,6 +31,9 @@ import com.github.alexthe666.iceandfire.pathfinding.raycoms.pathjobs.ICustomSize
 import com.github.alexthe666.iceandfire.util.WorldUtil;
 import com.github.alexthe666.iceandfire.world.DragonPosWorldData;
 import com.google.common.base.Predicate;
+
+import net.minecraft.client.CameraType;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -2175,8 +2178,11 @@ public abstract class EntityDragonBase extends TamableAnimal implements IPassabi
                             1.5d);
                     speed += glidingSpeedBonus;
                     // Try to match the moving vector to the rider's look vector
-                    forward = Mth.abs(Mth.cos(this.getXRot() * ((float) Math.PI / 180F)));
-                    vertical = Mth.abs(Mth.sin(this.getXRot() * ((float) Math.PI / 180F)));
+                    Minecraft mc = Minecraft.getInstance();
+                    boolean isThPersonBack = mc.options.getCameraType() == CameraType.THIRD_PERSON_BACK;
+                    float xrot = this.getXRot() - (isThPersonBack ? 20.0f : 0.0f);
+                    forward = Mth.abs(Mth.cos(xrot * ((float) Math.PI / 180F)));
+                    vertical = Mth.abs(Mth.sin(xrot * ((float) Math.PI / 180F)));
                     // Pitch is still responsive to spacebar and x key
                     if (isGoingUp() && !isGoingDown()) {
                         vertical = Math.max(vertical, 0.5);
@@ -2186,9 +2192,9 @@ public abstract class EntityDragonBase extends TamableAnimal implements IPassabi
                         vertical = 0;
                     }
                     // X rotation takes minus on looking upward
-                    else if (this.getXRot() < 0) {
+                    else if (xrot < 0) {
                         vertical *= 1;
-                    } else if (this.getXRot() > 0) {
+                    } else if (xrot > 0) {
                         vertical *= -1;
                     } else if (isControlledByLocalInstance()) {
                         // this.setDeltaMovement(this.getDeltaMovement().multiply(1.0f, 0.8f, 1.0f));
